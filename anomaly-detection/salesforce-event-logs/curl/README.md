@@ -12,6 +12,7 @@ SF_TOKEN_LIFETIME=3600
 SF_DOMAIN_NAME=yourdomain.sandbox.my.salesforce.com
 OUTPUT_DIRECTORY=placeholder
 CURRENT_SPRINT_DIRECTORY=placeholder
+EVENT_LOG_BASE_DIR=placeholder
 ```
 
 ### Sample commands

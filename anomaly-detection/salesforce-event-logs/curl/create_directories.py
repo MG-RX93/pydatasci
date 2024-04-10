@@ -25,7 +25,7 @@ quarter = sys.argv[2]
 sprint_name = sys.argv[3]
 
 # Define your base directory
-base_directory = "~/Downloads/ELF_DATA_PROD/"
+base_directory = os.getenv("EVENT_LOG_BASE_DIR")
 
 # Event types mapping
 event_types_mapping = {
