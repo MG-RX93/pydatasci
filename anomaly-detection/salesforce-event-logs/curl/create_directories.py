@@ -1,5 +1,9 @@
 import os
 import sys
+from dotenv import load_dotenv # pip install python-dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 def create_directory_structure(base_dir, financial_year, quarter, sprint_name, event_types):
     # Expand the user's home directory (~) if used in the base_dir
