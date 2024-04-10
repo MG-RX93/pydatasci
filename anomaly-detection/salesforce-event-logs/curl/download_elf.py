@@ -11,6 +11,18 @@ load_dotenv()
 domain_name = os.getenv("SF_DOMAIN_NAME")
 api_version = os.getenv("SF_VERSION_NUMBER")
 output_directory = os.getenv("OUTPUT_DIRECTORY")
+current_sprint_directory = os.getenv("CURRENT_SPRINT_DIRECTORY")
+
+# Define the mapping for event types
+EVENT_TYPE_MAPPING = {
+    'ApexExecution': 'APEX_EXECUTION',
+    'ApexTrigger': 'APEX_TRIGGER',
+    'FlowExecution': 'FLOW_EXECUTION',
+    'ApexUnexpectedException': 'APEX_UNEXPECTED_EXCEPTION',
+    'LightningPageView': 'LIGHTNING_PAGE_VIEW',
+    'API': 'API'
+    # Add more event type mappings here as needed
+}
 
 def download_event_log_files(query_file):
     data, access_token = get_salesforce_data(query_file)
@@ -22,17 +34,26 @@ def download_event_log_files(query_file):
         # Replace invalid characters for file names if needed
         valid_event_type = event_type.replace('/', '_')
 
+        if valid_event_type in EVENT_TYPE_MAPPING:
+            converted_event_type = EVENT_TYPE_MAPPING[valid_event_type]
+        else:
+            print(f"Warning: Unmapped event type '{valid_event_type}'. Using default conversion.")
+            converted_event_type = valid_event_type.upper()
+
+        # Construct the output directory dynamically based on the current sprint directory and valid_event_type
+        dynamic_output_directory = os.path.join(current_sprint_directory, converted_event_type)
+
+        # Ensure the dynamically created output directory exists
+        os.makedirs(os.path.expanduser(dynamic_output_directory), exist_ok=True)
+
         # Construct the output file name using the formatted date and event type
         output_file_name = f"{formatted_date}_{valid_event_type}.csv"
 
         # Construct the URL to download the EventLogFile
         download_url = f"https://{domain_name}/services/data/{api_version}/sobjects/EventLogFile/{record_id}/LogFile"
         
-        # Ensure the output directory exists
-        os.makedirs(os.path.expanduser(output_directory), exist_ok=True)
-        
         # Specify the output file path, ensuring directories in the path are expanded properly
-        output_file = os.path.expanduser(f"{output_directory}/{output_file_name}")
+        output_file = os.path.expanduser(f"{dynamic_output_directory}/{output_file_name}")
         
         # Construct the cURL command with authorization header and output file path
         curl_command = [
