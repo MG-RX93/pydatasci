@@ -13,9 +13,18 @@ api_version = os.getenv("SF_VERSION_NUMBER")
 output_directory = os.getenv("OUTPUT_DIRECTORY")
 
 def download_event_log_files(query_file):
-    record_ids, access_token = get_salesforce_data(query_file)
+    data, access_token = get_salesforce_data(query_file)
 
-    for record_id in record_ids:
+    for record_id, log_date, event_type in data:
+        # Format the date to match the desired output
+        formatted_date = log_date.split('T')[0]  # Extract date part before 'T'
+
+        # Replace invalid characters for file names if needed
+        valid_event_type = event_type.replace('/', '_')
+
+        # Construct the output file name using the formatted date and event type
+        output_file_name = f"{formatted_date}_{valid_event_type}.csv"
+
         # Construct the URL to download the EventLogFile
         download_url = f"https://{domain_name}/services/data/{api_version}/sobjects/EventLogFile/{record_id}/LogFile"
         
@@ -23,7 +32,7 @@ def download_event_log_files(query_file):
         os.makedirs(os.path.expanduser(output_directory), exist_ok=True)
         
         # Specify the output file path, ensuring directories in the path are expanded properly
-        output_file = os.path.expanduser(f"{output_directory}/outputLogFile_{record_id}.csv")
+        output_file = os.path.expanduser(f"{output_directory}/{output_file_name}")
         
         # Construct the cURL command with authorization header and output file path
         curl_command = [
