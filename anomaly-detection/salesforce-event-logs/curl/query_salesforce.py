@@ -44,3 +44,19 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         sys.exit(1)
+
+def get_soql_query_from_file(file_path):
+    """
+    Reads the SOQL query from a given file.
+
+    Parameters:
+    - file_path: A string representing the path to the .soql file.
+
+    Returns:
+    - A string containing the SOQL query.
+    
+    Raises:
+    - FileNotFoundError: If the specified file does not exist.
+    """
+    with open(file_path, "r") as file:
+        return file.read().strip()
