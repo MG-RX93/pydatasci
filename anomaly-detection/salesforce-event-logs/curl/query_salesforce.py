@@ -33,14 +33,8 @@ def main(query_file):
     # Run the SOQL query to get the results
     query_result, access_token = run_soql_query(soql_query)
 
-    # Extract record IDs from the query result
-    data = [
-        (record["Id"], record["LogDate"], record["EventType"])
-        for record in query_result["records"]
-    ]
-
-    # Return both the record IDs and the access token
-    return data, access_token
+    # Return both the query result and the access token
+    return query_result, access_token
 
 
 if __name__ == "__main__":

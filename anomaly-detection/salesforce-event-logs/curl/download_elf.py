@@ -26,7 +26,13 @@ EVENT_TYPE_MAPPING = {
 
 
 def download_event_log_files(query_file):
-    data, access_token = get_salesforce_data(query_file)
+    query_result, access_token = get_salesforce_data(query_file)
+
+    # Extract record IDs from the query result
+    data = [
+        (record["Id"], record["LogDate"], record["EventType"])
+        for record in query_result["records"]
+    ]
 
     for record_id, log_date, event_type in data:
         # Format the date to match the desired output
