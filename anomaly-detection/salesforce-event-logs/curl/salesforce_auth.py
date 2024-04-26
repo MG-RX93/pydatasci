@@ -39,3 +39,13 @@ def get_cached_access_token() -> str:
     if _cached_token and not is_token_expired():
         return _cached_token
     return None
+
+def is_token_expired() -> bool:
+    """
+    Checks if the cached access token has expired.
+
+    Returns:
+        bool: True if the token has expired; False otherwise.
+    """
+    global _token_expiry
+    return datetime.now() >= _token_expiry
