@@ -60,3 +60,30 @@ def get_soql_query_from_file(file_path):
     """
     with open(file_path, "r") as file:
         return file.read().strip()
+    
+def execute_soql_query(query):
+    """
+    Executes a SOQL (Salesforce Object Query Language) query against the Salesforce API.
+
+    Parameters:
+    - query: A string representing the SOQL query to be executed.
+
+    Returns:
+    - A dictionary containing the JSON response from the Salesforce API.
+
+    Raises:
+    - requests.exceptions.RequestException: If the query execution fails or the response status code is not 200.
+    """
+    access_token, instance_url = get_access_token()
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json",
+    }
+    version_number = os.getenv("SF_VERSION_NUMBER")  # Ensure SF_VERSION_NUMBER is defined in .env
+
+    query_url = f"{instance_url}/services/data/v{version_number}/query/"
+
+    response = requests.get(query_url, headers=headers, params={"q": query})
+    if response.status_code != 200:
+        raise requests.exceptions.RequestException(f"Query failed: {response.text}")
+    return response.json(), access_token
