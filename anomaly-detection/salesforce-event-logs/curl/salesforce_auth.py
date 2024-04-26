@@ -29,6 +29,7 @@ def get_access_token() -> tuple:
 
     return access_token, _instance_url
 
+
 def get_cached_access_token() -> str:
     """
     Retrieves the cached access token if it is still valid.
@@ -40,6 +41,7 @@ def get_cached_access_token() -> str:
         return _cached_token
     return None
 
+
 def is_token_expired() -> bool:
     """
     Checks if the cached access token has expired.
@@ -49,6 +51,7 @@ def is_token_expired() -> bool:
     """
     global _token_expiry
     return datetime.now() >= _token_expiry
+
 
 def request_new_access_token() -> tuple:
     """
@@ -84,7 +87,12 @@ def request_new_access_token() -> tuple:
     auth_response = response.json()
     validate_auth_response(auth_response)
 
-    return auth_response["access_token"], auth_response["instance_url"], auth_response["issued_at"]
+    return (
+        auth_response["access_token"],
+        auth_response["instance_url"],
+        auth_response["issued_at"],
+    )
+
 
 def validate_auth_response(response: dict):
     """
@@ -98,7 +106,10 @@ def validate_auth_response(response: dict):
     """
     required_keys = ["access_token", "instance_url", "issued_at"]
     if not all(key in response for key in required_keys):
-        raise Exception("Authentication response from Salesforce is missing required keys.")
+        raise Exception(
+            "Authentication response from Salesforce is missing required keys."
+        )
+
 
 def cache_access_token(access_token: str, instance_url: str, issued_at: str):
     """
@@ -110,7 +121,9 @@ def cache_access_token(access_token: str, instance_url: str, issued_at: str):
         issued_at (str): The timestamp indicating when the token was issued.
     """
     global _cached_token, _token_expiry, _instance_url
-    token_lifetime = int(os.getenv("SF_TOKEN_LIFETIME", "3600"))  # Default to 1 hour if not set
+    token_lifetime = int(
+        os.getenv("SF_TOKEN_LIFETIME", "3600")
+    )  # Default to 1 hour if not set
 
     _cached_token = access_token
     _instance_url = instance_url
