@@ -8,34 +8,22 @@ from salesforce_auth import get_access_token
 load_dotenv()
 
 
-def run_soql_query(query):
-    access_token, instance_url = get_access_token()
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "Content-Type": "application/json",
-    }
-    version_number = os.getenv("SF_VERSION_NUMBER")
+def main(query_input):
+    """
+    Main function that processes the input to determine if it is a file path or a direct query string,
+    then executes the query and returns the results.
 
-    # Adjust the version number as per your Salesforce API version
-    query_url = f"{instance_url}/services/data/v{version_number}/query/"
+    Parameters:
+    - query_input: A string that can either be a file path to a .soql file containing a SOQL query or a direct SOQL query string.
 
-    response = requests.get(query_url, headers=headers, params={"q": query})
-    if response.status_code == 200:
-        return response.json(), access_token
-    else:
-        raise Exception(f"Query failed: {response.text}")
+    Returns:
+    - A dictionary containing the query results.
+    """
+    soql_query = query_input
+    if os.path.isfile(query_input):
+        soql_query = get_soql_query_from_file(query_input)
 
-
-def main(query_file):
-    with open(query_file, "r") as file:
-        soql_query = file.read().strip()
-
-    # Run the SOQL query to get the results
-    query_result, access_token = run_soql_query(soql_query)
-
-    # Return both the query result and the access token
-    return query_result, access_token
-
+    return execute_soql_query(soql_query)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -45,11 +33,14 @@ if __name__ == "__main__":
     query_file = sys.argv[1]
 
     try:
-        record_ids = main(query_file)
-        print(record_ids)
+        query_result = main(query_file)
+        print(query_result)  # Print the query result to the console
     except FileNotFoundError:
         print(f"The file {query_file} does not exist.")
         sys.exit(1)
+    except requests.exceptions.RequestException as e:
+        print(f"Query failed: {e}")
+        sys.exit(1)
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"An unexpected error occurred: {e}")
         sys.exit(1)
