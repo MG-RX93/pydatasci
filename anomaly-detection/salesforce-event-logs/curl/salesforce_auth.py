@@ -85,3 +85,17 @@ def request_new_access_token() -> tuple:
     validate_auth_response(auth_response)
 
     return auth_response["access_token"], auth_response["instance_url"], auth_response["issued_at"]
+
+def validate_auth_response(response: dict):
+    """
+    Validates the authentication response from Salesforce.
+
+    Parameters:
+        response (dict): The JSON response received from the Salesforce authentication endpoint.
+
+    Raises:
+        Exception: If the response is missing required keys.
+    """
+    required_keys = ["access_token", "instance_url", "issued_at"]
+    if not all(key in response for key in required_keys):
+        raise Exception("Authentication response from Salesforce is missing required keys.")
