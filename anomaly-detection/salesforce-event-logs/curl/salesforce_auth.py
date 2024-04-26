@@ -49,3 +49,39 @@ def is_token_expired() -> bool:
     """
     global _token_expiry
     return datetime.now() >= _token_expiry
+
+def request_new_access_token() -> tuple:
+    """
+    Requests a new access token from the Salesforce authentication endpoint.
+
+    Returns:
+        tuple: The new access token and instance URL.
+
+    Raises:
+        Exception: If the request fails or if the response from Salesforce is not as expected.
+    """
+    # Retrieve authentication credentials and endpoint from environment variables
+    auth_url = os.getenv("SF_AUTH_URL")
+    client_id = os.getenv("SF_CONSUMER_KEY")
+    client_secret = os.getenv("SF_CONSUMER_SECRET")
+    username = os.getenv("SF_USERNAME")
+    password = os.getenv("SF_PASSWORD")
+
+    # Prepare data payload for the authentication request
+    data = {
+        "grant_type": "password",
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "username": username,
+        "password": password,
+    }
+
+    # Make the authentication request to Salesforce
+    response = requests.post(auth_url, data=data)
+    if response.status_code != 200:
+        raise Exception(f"Authentication failed: {response.text}")
+
+    auth_response = response.json()
+    validate_auth_response(auth_response)
+
+    return auth_response["access_token"], auth_response["instance_url"], auth_response["issued_at"]
