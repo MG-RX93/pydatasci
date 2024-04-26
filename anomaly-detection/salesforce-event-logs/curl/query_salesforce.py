@@ -25,6 +25,7 @@ def main(query_input):
 
     return execute_soql_query(soql_query)
 
+
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: python script.py <PATH_TO_QUERY_FILE>.soql")
@@ -45,6 +46,7 @@ if __name__ == "__main__":
         print(f"An unexpected error occurred: {e}")
         sys.exit(1)
 
+
 def get_soql_query_from_file(file_path):
     """
     Reads the SOQL query from a given file.
@@ -54,13 +56,14 @@ def get_soql_query_from_file(file_path):
 
     Returns:
     - A string containing the SOQL query.
-    
+
     Raises:
     - FileNotFoundError: If the specified file does not exist.
     """
     with open(file_path, "r") as file:
         return file.read().strip()
-    
+
+
 def execute_soql_query(query):
     """
     Executes a SOQL (Salesforce Object Query Language) query against the Salesforce API.
@@ -79,7 +82,9 @@ def execute_soql_query(query):
         "Authorization": f"Bearer {access_token}",
         "Content-Type": "application/json",
     }
-    version_number = os.getenv("SF_VERSION_NUMBER")  # Ensure SF_VERSION_NUMBER is defined in .env
+    version_number = os.getenv(
+        "SF_VERSION_NUMBER"
+    )  # Ensure SF_VERSION_NUMBER is defined in .env
 
     query_url = f"{instance_url}/services/data/v{version_number}/query/"
 
