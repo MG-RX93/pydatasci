@@ -99,3 +99,20 @@ def validate_auth_response(response: dict):
     required_keys = ["access_token", "instance_url", "issued_at"]
     if not all(key in response for key in required_keys):
         raise Exception("Authentication response from Salesforce is missing required keys.")
+
+def cache_access_token(access_token: str, instance_url: str, issued_at: str):
+    """
+    Caches the new access token and calculates its expiry time.
+
+    Parameters:
+        access_token (str): The new access token.
+        instance_url (str): The Salesforce instance URL.
+        issued_at (str): The timestamp indicating when the token was issued.
+    """
+    global _cached_token, _token_expiry, _instance_url
+    token_lifetime = int(os.getenv("SF_TOKEN_LIFETIME", "3600"))  # Default to 1 hour if not set
+
+    _cached_token = access_token
+    _instance_url = instance_url
+    issued_at_datetime = datetime.fromtimestamp(int(issued_at) / 1000)
+    _token_expiry = issued_at_datetime + timedelta(seconds=token_lifetime)
