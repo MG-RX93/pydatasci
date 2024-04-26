@@ -28,3 +28,14 @@ def get_access_token() -> tuple:
         _instance_url = instance_url
 
     return access_token, _instance_url
+
+def get_cached_access_token() -> str:
+    """
+    Retrieves the cached access token if it is still valid.
+
+    Returns:
+        str: The cached access token, or None if the token has expired or is not cached.
+    """
+    if _cached_token and not is_token_expired():
+        return _cached_token
+    return None
